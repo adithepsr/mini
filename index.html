@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="th">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EDU Running 2025 Timer</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Kanit', 'Prompt', 'Sarabun', sans-serif;
+      overflow: hidden;
+    }
+
+    html {
+      height: 100%;
+    }
+
+    .timer-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 3%;
+      position: relative;
+      background-image: url('https://edurunning.com/assets/pic/459599399_.%20_.%20829_n.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    
+    .timer-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.4);
+      z-index: 0;
+    }
+    
+    .timer-container > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .event-header {
+      text-align: center;
+      margin-bottom: 2%;
+      animation: fadeInDown 1s ease-out;
+    }
+
+    .organizer {
+      font-weight: 700;
+      margin-bottom: 1%;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+    }
+
+    .event-title {
+      font-weight: 800;
+      margin-bottom: 0.5%;
+      line-height: 1.2;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+    }
+
+    .event-subtitle {
+      font-weight: 500;
+      opacity: 0.95;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+    }
+
+    .timer-display {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 4%;
+      animation: fadeInUp 1s ease-out;
+      padding: 3% 5%;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      background-color: rgba(255, 255, 255, 0.95);
+    }
+
+    .time-value {
+      font-weight: 700;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.05em;
+    }
+
+    .time-separator {
+      font-weight: 700;
+      opacity: 0.6;
+      animation: blink 1s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 49% {
+        opacity: 1;
+      }
+      50%, 100% {
+        opacity: 0.3;
+      }
+    }
+
+    .controls {
+      display: flex;
+      gap: 20px;
+      animation: fadeInUp 1.2s ease-out;
+    }
+
+    .control-btn {
+      padding: 18px 48px;
+      border: none;
+      border-radius: 50px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .control-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .control-btn:active {
+      transform: translateY(0);
+    }
+
+    .control-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .running-icon {
+      position: absolute;
+      bottom: 3%;
+      right: 3%;
+      font-size: 80px;
+      opacity: 0.2;
+      animation: bounce 2s ease-in-out infinite;
+      filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.8));
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    .pulse {
+      animation: pulse 1s ease-in-out infinite;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="timer-container" id="container">
+   <div class="event-header">
+    <div class="organizer" id="organizer">
+     ตุ้มโฮม
+    </div>
+    <div class="event-title" id="eventTitle">
+     ครูชวนวิ่ง EDU RUNNING 2025
+    </div>
+    <div class="event-subtitle" id="eventSubtitle">
+     Fun Run 5.4 กม.
+    </div>
+   </div>
+   <div class="timer-display" id="timerDisplay"><span class="time-value" id="hours">00</span> <span class="time-separator">:</span> <span class="time-value" id="minutes">00</span> <span class="time-separator">:</span> <span class="time-value" id="seconds">00</span>
+   </div>
+   <div class="controls"><button class="control-btn" id="startBtn">เริ่ม</button> <button class="control-btn" id="pauseBtn" disabled>หยุด</button> <button class="control-btn" id="resetBtn">รีเซ็ต</button>
+   </div>
+   <div class="running-icon">
+    🏃
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      background_color: '#1e3a8a',
+      surface_color: '#ffffff',
+      text_color: '#1e293b',
+      primary_action_color: '#10b981',
+      secondary_action_color: '#ef4444',
+      font_family: 'Kanit',
+      font_size: 16,
+      event_title: 'ครูชวนวิ่ง EDU RUNNING 2025',
+      event_subtitle: 'Fun Run 5.4 กม.',
+      organizer_text: 'ตุ้มโฮม'
+    };
+
+    let startTime = 0;
+    let elapsedTime = 0;
+    let timerInterval = null;
+    let isRunning = false;
+
+    const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    function updateDisplay() {
+      const totalSeconds = Math.floor(elapsedTime / 1000);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+      document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+      document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+    }
+
+    function startTimer() {
+      if (!isRunning) {
+        startTime = Date.now() - elapsedTime;
+        timerInterval = setInterval(() => {
+          elapsedTime = Date.now() - startTime;
+          updateDisplay();
+        }, 100);
+        isRunning = true;
+        startBtn.disabled = true;
+        pauseBtn.disabled = false;
+      }
+    }
+
+    function pauseTimer() {
+      if (isRunning) {
+        clearInterval(timerInterval);
+        isRunning = false;
+        startBtn.disabled = false;
+        pauseBtn.disabled = true;
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      isRunning = false;
+      elapsedTime = 0;
+      startTime = 0;
+      updateDisplay();
+      startBtn.disabled = false;
+      pauseBtn.disabled = true;
+    }
+
+    startBtn.addEventListener('click', startTimer);
+    pauseBtn.addEventListener('click', pauseTimer);
+    resetBtn.addEventListener('click', resetTimer);
+
+    async function onConfigChange(config) {
+      const organizer = document.getElementById('organizer');
+      const eventTitle = document.getElementById('eventTitle');
+      const eventSubtitle = document.getElementById('eventSubtitle');
+      const timeValues = document.querySelectorAll('.time-value');
+      const timeSeparators = document.querySelectorAll('.time-separator');
+
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action_color || defaultConfig.primary_action_color;
+      const secondaryColor = config.secondary_action_color || defaultConfig.secondary_action_color;
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+
+      organizer.textContent = config.organizer_text || defaultConfig.organizer_text;
+      organizer.style.color = surfaceColor;
+      organizer.style.fontSize = `${baseSize * 1.5}px`;
+      organizer.style.fontFamily = `${customFont}, 'Kanit', 'Prompt', sans-serif`;
+
+      eventTitle.textContent = config.event_title || defaultConfig.event_title;
+      eventTitle.style.color = surfaceColor;
+      eventTitle.style.fontSize = `${baseSize * 3}px`;
+      eventTitle.style.fontFamily = `${customFont}, 'Kanit', 'Prompt', sans-serif`;
+
+      eventSubtitle.textContent = config.event_subtitle || defaultConfig.event_subtitle;
+      eventSubtitle.style.color = surfaceColor;
+      eventSubtitle.style.fontSize = `${baseSize * 1.25}px`;
+      eventSubtitle.style.fontFamily = `${customFont}, 'Kanit', 'Prompt', sans-serif`;
+
+      timeValues.forEach(value => {
+        value.style.fontSize = `${baseSize * 7}px`;
+        value.style.color = textColor;
+        value.style.fontFamily = `${customFont}, 'Kanit', 'Prompt', sans-serif`;
+      });
+
+      timeSeparators.forEach(sep => {
+        sep.style.fontSize = `${baseSize * 7}px`;
+        sep.style.color = textColor;
+        sep.style.fontFamily = `${customFont}, 'Kanit', 'Prompt', sans-serif`;
+      });
+
+      startBtn.style.backgroundColor = primaryColor;
+      startBtn.style.color = surfaceColor;
+      startBtn.style.fontSize = `${baseSize * 1.125}px`;
+      startBtn.style.fontFamily = `${customFont}, 'Kanit', 'Prompt', sans-serif`;
+
+      pauseBtn.style.backgroundColor = secondaryColor;
+      pauseBtn.style.color = surfaceColor;
+      pauseBtn.style.fontSize = `${baseSize * 1.125}px`;
+      pauseBtn.style.fontFamily = `${customFont}, 'Kanit', 'Prompt', sans-serif`;
+
+      resetBtn.style.backgroundColor = textColor;
+      resetBtn.style.color = surfaceColor;
+      resetBtn.style.fontSize = `${baseSize * 1.125}px`;
+      resetBtn.style.fontFamily = `${customFont}, 'Kanit', 'Prompt', sans-serif`;
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_color || defaultConfig.background_color,
+              set: (value) => {
+                config.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            },
+            {
+              get: () => config.surface_color || defaultConfig.surface_color,
+              set: (value) => {
+                config.surface_color = value;
+                window.elementSdk.setConfig({ surface_color: value });
+              }
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => {
+                config.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            },
+            {
+              get: () => config.primary_action_color || defaultConfig.primary_action_color,
+              set: (value) => {
+                config.primary_action_color = value;
+                window.elementSdk.setConfig({ primary_action_color: value });
+              }
+            },
+            {
+              get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+              set: (value) => {
+                config.secondary_action_color = value;
+                window.elementSdk.setConfig({ secondary_action_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => config.font_family || defaultConfig.font_family,
+            set: (value) => {
+              config.font_family = value;
+              window.elementSdk.setConfig({ font_family: value });
+            }
+          },
+          fontSizeable: {
+            get: () => config.font_size || defaultConfig.font_size,
+            set: (value) => {
+              config.font_size = value;
+              window.elementSdk.setConfig({ font_size: value });
+            }
+          }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ['event_title', config.event_title || defaultConfig.event_title],
+          ['event_subtitle', config.event_subtitle || defaultConfig.event_subtitle],
+          ['organizer_text', config.organizer_text || defaultConfig.organizer_text]
+        ])
+      });
+
+      onConfigChange(window.elementSdk.config);
+    } else {
+      onConfigChange(defaultConfig);
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a292d7272746061',t:'MTc2MzgyMjM4MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
